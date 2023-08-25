@@ -1,0 +1,7 @@
+# User configurations
+.python-version
+
+# Automatically generated
+/build
+/src/pytool_directory.egg-info
+__pycache__
