@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pytool-directory"
+version = "0.0.1"
+authors = [
+    {name = "Sheile"},
+]
+description = "Python package to create langchain tool from the Tool Directory For LangChain."
+readme = "README.md"
+requires-python = ">=3.9"
+keywords = ["langchain", "gpt", "dialogplay"]
+license = {text = "MIT"}
+classifiers = [
+    "Programming Language :: Python :: 3",
+]
