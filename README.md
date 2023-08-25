@@ -8,3 +8,19 @@ Can create langchain tool from definition in the Tool Directory.
 Usage
 -------------------------
 WIP
+
+
+Contribution
+-------------------------
+1. Fork and clone repository.
+2. Install development dependencies.
+```
+pip install '.[dev]'
+```
+
+3. Install pre-commit hook for linter and formatter.
+```
+pre-commit install
+```
+
+4. Commit your changes and send pull request.
