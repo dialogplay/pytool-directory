@@ -25,6 +25,11 @@ dev = [
     "flake8-quotes",
 ]
 
+[tool.black]
+line-length = 120
+skip-string-normalization = true
+preview = true
+
 [tool.flake8]
 exclude = [
   "./build"
