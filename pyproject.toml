@@ -16,3 +16,20 @@ license = {text = "MIT"}
 classifiers = [
     "Programming Language :: Python :: 3",
 ]
+
+[project.optional-dependencies]
+dev = [
+    "pre-commit",
+    "flake8",
+    "pyproject-flake8",
+    "flake8-quotes",
+]
+
+[tool.flake8]
+exclude = [
+  "./build"
+]
+max-line-length = 120
+inline-quotes = "single"
+multiline-quotes = "single"
+docstring-quotes = "single"
