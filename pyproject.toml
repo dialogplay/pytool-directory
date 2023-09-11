@@ -23,6 +23,9 @@ dev = [
     "flake8",
     "pyproject-flake8",
     "flake8-quotes",
+    "pytest",
+    "pytest-describe",
+    "pytest-watcher",
 ]
 
 [tool.black]
@@ -38,3 +41,7 @@ max-line-length = 120
 inline-quotes = "single"
 multiline-quotes = "single"
 docstring-quotes = "single"
+
+[tool.pytest.ini_options]
+pythonpath = "src"
+testpaths = ["tests"]
