@@ -16,6 +16,12 @@ license = {text = "MIT"}
 classifiers = [
     "Programming Language :: Python :: 3",
 ]
+dependencies = [
+  "pydantic",
+  "requests",
+  "openai",
+  "langchain",
+]
 
 [project.optional-dependencies]
 dev = [
@@ -26,6 +32,7 @@ dev = [
     "pytest",
     "pytest-describe",
     "pytest-watcher",
+    "requests-mock",
 ]
 
 [tool.black]
