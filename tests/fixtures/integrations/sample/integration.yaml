@@ -1,0 +1,22 @@
+version: 0.0.1-dev
+openApi: ./openapi.yaml
+description: dummy integration description
+paths:
+  /pets:
+    get:
+      description:
+        en: Retrieves dummy data from api.
+        ja: APIからダミーデータを取得する。
+      parameters:
+        - in: query
+          name: api_key
+          description:
+            en: Dummy parameter for preconfiguration.
+            ja: 事前設定するダミーパラメーター
+          runtime: false
+        - in: query
+          name: limit
+          description:
+            en: Dummy parameter for runtime.
+            ja: 実行時に指定するダミーパラメーター。
+          runtime: true
