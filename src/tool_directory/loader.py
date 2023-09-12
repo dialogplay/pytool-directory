@@ -96,6 +96,7 @@ class ToolLoader:
                         path=path,
                         description=description,
                         args_schema=self._create_args_schema(endpoint),
+                        args_source=self._create_args_source(endpoint),
                     )
                 )
 
@@ -109,3 +110,10 @@ class ToolLoader:
         }
 
         return create_model('ArgumentsSchema', **parameters)
+
+    def _create_args_source(self, endpoint: Dict[str, Any]) -> Dict[str, str]:
+        args_source = {}
+        for parameter in endpoint.get('parameters', []):
+            args_source[parameter.get('name')] = parameter.get('in')
+
+        return args_source

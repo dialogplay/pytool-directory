@@ -1,4 +1,5 @@
 import re
+from functools import cached_property
 from typing import Dict, Type
 
 import requests
@@ -13,6 +14,19 @@ class Endpoint(BaseModel):
     path: str
     description: str
     args_schema: Type[BaseModel]
+    args_source: Dict[str, str]
+
+    class Config:
+        # Allow @cached_property with pydantic v1
+        keep_untouched = (cached_property,)
+
+    @cached_property
+    def path_args(self):
+        return [k for k, v in self.args_source.items() if v == 'path']
+
+    @cached_property
+    def query_args(self):
+        return [k for k, v in self.args_source.items() if v == 'query']
 
 
 class OpenApiTool(StructuredTool):
@@ -37,11 +51,13 @@ class OpenApiTool(StructuredTool):
         )
 
     def request_by_spec(self, **kwargs):
-        url = self.server + self.endpoint.path
+        path_args = {k: v for k, v in kwargs.items() if k in self.endpoint.path_args}
+        query_args = {k: v for k, v in kwargs.items() if k in self.endpoint.query_args}
+        url = (self.server + self.endpoint.path).format(**path_args)
         if self.endpoint.method == 'get':
-            response = requests.get(url, params=kwargs | self.parameters)
+            response = requests.get(url, params=query_args | self.parameters)
         elif self.endpoint.method == 'post':
-            response = requests.post(url, data=kwargs | self.parameters)
+            response = requests.post(url, data=query_args | self.parameters)
 
         response.raise_for_status()
         try:

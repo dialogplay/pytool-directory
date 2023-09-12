@@ -7,6 +7,10 @@ def describe_OpenApiTool():
     class ArgsSchema(BaseModel):
         query: str
 
+    class ArgsSchemaWithId(BaseModel):
+        id: str
+        query: str
+
     def describe_init():
         def initialize_tool():
             endpoint = Endpoint(
@@ -14,6 +18,7 @@ def describe_OpenApiTool():
                 path='/dummy',
                 description='Endpoint description',
                 args_schema=ArgsSchema,
+                args_source={'api_key': 'query', 'query': 'query'},
             )
             tool = OpenApiTool(
                 description='Integration description',
@@ -32,7 +37,8 @@ def describe_OpenApiTool():
                 method='get',
                 path='/dummy/{id}',
                 description='Endpoint description',
-                args_schema=ArgsSchema,
+                args_schema=ArgsSchemaWithId,
+                args_source={'id': 'path', 'api_key': 'query', 'query': 'query'},
             )
             tool = OpenApiTool(
                 description='Integration description',
@@ -58,6 +64,7 @@ def describe_OpenApiTool():
                 path='/dummy',
                 description='Endpoint description',
                 args_schema=ArgsSchema,
+                args_source={'api_key': 'query', 'query': 'query'},
             )
             tool = OpenApiTool(
                 description='Integration description',
@@ -88,6 +95,7 @@ def describe_OpenApiTool():
                 path='/dummy',
                 description='Endpoint description',
                 args_schema=ArgsSchema,
+                args_source={'api_key': 'query', 'query': 'query'},
             )
             tool = OpenApiTool(
                 description='Integration description',
@@ -106,3 +114,34 @@ def describe_OpenApiTool():
             assert history.netloc == 'localhost'
             assert history.path == '/dummy'
             assert history.text == 'query=dummy+query&api_key=dummy'
+
+        def send_request_with_parameter_in_path(requests_mock):
+            requests_mock.get('http://localhost/dummy/42', text='{"result": "dummy"}')
+
+            endpoint = Endpoint(
+                method='get',
+                path='/dummy/{id}',
+                description='Endpoint description',
+                args_schema=ArgsSchemaWithId,
+                args_source={'id': 'path', 'api_key': 'query', 'query': 'query'},
+            )
+            tool = OpenApiTool(
+                description='Integration description',
+                server='http://localhost',
+                endpoint=endpoint,
+                parameters={'api_key': 'dummy'},
+            )
+            result = tool.request_by_spec(id='42', query='dummy query')
+            assert result == {'result': 'dummy'}
+
+            assert len(requests_mock.request_history) == 1
+
+            history = requests_mock.request_history[0]
+            assert history.method == 'GET'
+            assert history.scheme == 'http'
+            assert history.netloc == 'localhost'
+            assert history.path == '/dummy/42'
+            assert history.qs == {
+                'api_key': ['dummy'],
+                'query': ['dummy query'],
+            }
