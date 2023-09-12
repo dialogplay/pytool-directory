@@ -65,6 +65,15 @@ def describe_ToolLoader():
             assert tools[1].endpoint.description == 'Create a pet'
             assert tools[2].endpoint.description == 'Info for a specific pet'
 
+            assert tools[0].endpoint.args_source == {
+                'api_key': 'query',
+                'limit': 'query',
+            }
+            assert tools[1].endpoint.args_source == {}
+            assert tools[2].endpoint.args_source == {
+                'petId': 'path',
+            }
+
             assert tools[0].parameters == {'api_key': 'dummy'}
             assert tools[1].parameters == {'api_key': 'dummy'}
             assert tools[2].parameters == {'api_key': 'dummy'}
