@@ -1,6 +1,7 @@
 import re
 from typing import Dict, Type
 
+import requests
 from langchain.tools.base import StructuredTool
 from pydantic.v1 import BaseModel
 
@@ -36,4 +37,14 @@ class OpenApiTool(StructuredTool):
         )
 
     def request_by_spec(self, **kwargs):
-        return {}
+        url = self.server + self.endpoint.path
+        if self.endpoint.method == 'get':
+            response = requests.get(url, params=kwargs | self.parameters)
+        elif self.endpoint.method == 'post':
+            response = requests.post(url, data=kwargs | self.parameters)
+
+        response.raise_for_status()
+        try:
+            return response.json()
+        except Exception:
+            return response.text
