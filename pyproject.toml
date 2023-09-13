@@ -15,6 +15,7 @@ keywords = ["langchain", "gpt", "dialogplay"]
 license = {text = "MIT"}
 classifiers = [
     "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
 ]
 dependencies = [
   "pydantic",
@@ -22,6 +23,11 @@ dependencies = [
   "openai",
   "langchain",
 ]
+
+[project.urls]
+"Homepage" = "https://github.com/dialogplay/pytool-directory"
+"Bug Tracker" = "https://github.com/dialogplay/pytool-directory/issues"
+"Source" = "https://github.com/dialogplay/pytool-directory"
 
 [project.optional-dependencies]
 dev = [
