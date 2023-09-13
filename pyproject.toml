@@ -22,6 +22,7 @@ dependencies = [
   "requests",
   "openai",
   "langchain",
+  "PyYAML",
 ]
 
 [project.urls]
