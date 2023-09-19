@@ -145,3 +145,22 @@ def describe_OpenApiTool():
                 'api_key': ['dummy'],
                 'query': ['dummy query'],
             }
+
+        def ignore_unsupported_method(requests_mock):
+            endpoint = Endpoint(
+                method='patch',
+                path='/dummy',
+                description='Endpoint description',
+                args_schema=ArgsSchema,
+                args_source={'query': 'query'},
+            )
+            tool = OpenApiTool(
+                description='Integration description',
+                server='http://localhost',
+                endpoint=endpoint,
+                parameters={'api_key': 'dummy'},
+            )
+            result = tool.request_by_spec(query='dummy query')
+            assert result is None
+
+            assert len(requests_mock.request_history) == 0

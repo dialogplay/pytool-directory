@@ -58,6 +58,8 @@ class OpenApiTool(StructuredTool):
             response = requests.get(url, params=query_args | self.parameters)
         elif self.endpoint.method == 'post':
             response = requests.post(url, data=query_args | self.parameters)
+        else:
+            return None
 
         response.raise_for_status()
         try:
