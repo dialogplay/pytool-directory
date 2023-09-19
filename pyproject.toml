@@ -37,6 +37,7 @@ dev = [
     "pyproject-flake8",
     "flake8-quotes",
     "pytest",
+    "pytest-cov",
     "pytest-describe",
     "pytest-watcher",
     "requests-mock",
@@ -59,3 +60,11 @@ docstring-quotes = "single"
 [tool.pytest.ini_options]
 pythonpath = "src"
 testpaths = ["tests"]
+addopts = "--cov"
+
+[tool.coverage.run]
+branch = true
+source = ["src"]
+
+[tool.coverage.report]
+show_missing = true

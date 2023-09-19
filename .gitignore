@@ -6,3 +6,4 @@
 /src/pytool_directory.egg-info
 __pycache__
 /dist
+.coverage
