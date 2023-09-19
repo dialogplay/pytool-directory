@@ -87,6 +87,25 @@ def describe_OpenApiTool():
                 'query': ['dummy query'],
             }
 
+        def send_get_request_and_return_plain_text(requests_mock):
+            requests_mock.get('http://localhost/dummy', text='result is plain text')
+
+            endpoint = Endpoint(
+                method='get',
+                path='/dummy',
+                description='Endpoint description',
+                args_schema=ArgsSchema,
+                args_source={'query': 'query'},
+            )
+            tool = OpenApiTool(
+                description='Integration description',
+                server='http://localhost',
+                endpoint=endpoint,
+                parameters={},
+            )
+            result = tool.request_by_spec(query='dummy query')
+            assert result == 'result is plain text'
+
         def send_post_request(requests_mock):
             requests_mock.post('http://localhost/dummy', text='{"result": "dummy"}')
 

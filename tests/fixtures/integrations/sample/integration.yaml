@@ -16,7 +16,13 @@ paths:
           runtime: false
         - in: query
           name: limit
-          description:
-            en: Dummy parameter for runtime.
-            ja: 実行時に指定するダミーパラメーター。
+          description: Dummy parameter for runtime.
           runtime: true
+    post:
+      parameters:
+        - in: query
+          name: api_key
+          runtime: false
+        - in: query
+          name: not_found
+          description: Ignore description for undefined parameter
