@@ -1,5 +1,7 @@
 pytool-directory
 =========================
+[![Unittest](https://github.com/dialogplay/pytool-directory/actions/workflows/unittest.yaml/badge.svg)](https://github.com/dialogplay/pytool-directory/actions/workflows/unittest.yaml)
+
 Python package to create the [LangChain](https://github.com/langchain-ai/langchain) tool from the [Tool Directory For LangChain](https://github.com/dialogplay/tool-directory/).
 
 Can create LangChain tool from definition in the Tool Directory.
