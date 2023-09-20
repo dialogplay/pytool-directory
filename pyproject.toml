@@ -1,0 +1,70 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pytool-directory"
+version = "0.0.1"
+authors = [
+    {name = "Sheile"},
+]
+description = "Python package to create langchain tool from the Tool Directory For LangChain."
+readme = "README.md"
+requires-python = ">=3.9"
+keywords = ["langchain", "gpt", "dialogplay"]
+license = {text = "MIT"}
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+]
+dependencies = [
+  "pydantic",
+  "requests",
+  "openai",
+  "langchain",
+  "PyYAML",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/dialogplay/pytool-directory"
+"Bug Tracker" = "https://github.com/dialogplay/pytool-directory/issues"
+"Source" = "https://github.com/dialogplay/pytool-directory"
+
+[project.optional-dependencies]
+dev = [
+    "pre-commit",
+    "flake8",
+    "pyproject-flake8",
+    "flake8-quotes",
+    "pytest",
+    "pytest-cov",
+    "pytest-describe",
+    "pytest-watcher",
+    "requests-mock",
+]
+
+[tool.black]
+line-length = 120
+skip-string-normalization = true
+preview = true
+
+[tool.flake8]
+exclude = [
+  "./build"
+]
+max-line-length = 120
+inline-quotes = "single"
+multiline-quotes = "single"
+docstring-quotes = "single"
+
+[tool.pytest.ini_options]
+pythonpath = "src"
+testpaths = ["tests"]
+addopts = "--cov"
+
+[tool.coverage.run]
+branch = true
+source = ["src"]
+
+[tool.coverage.report]
+show_missing = true
