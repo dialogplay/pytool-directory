@@ -53,11 +53,12 @@ class OpenApiTool(StructuredTool):
     def request_by_spec(self, **kwargs):
         path_args = {k: v for k, v in kwargs.items() if k in self.endpoint.path_args}
         query_args = {k: v for k, v in kwargs.items() if k in self.endpoint.query_args}
+        headers = {k: v for k, v in self.parameters.items() if ':' not in k}
         url = (self.server + self.endpoint.path).format(**path_args)
         if self.endpoint.method == 'get':
-            response = requests.get(url, params=query_args | self.parameters)
+            response = requests.get(url, params=query_args | self.parameters, headers=headers)
         elif self.endpoint.method == 'post':
-            response = requests.post(url, data=query_args | self.parameters)
+            response = requests.post(url, data=query_args | self.parameters, headers=headers)
         else:
             return None
 
