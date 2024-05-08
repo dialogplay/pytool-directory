@@ -3,13 +3,41 @@ from pydantic.v1 import BaseModel
 from tool_directory.model import Endpoint, OpenApiTool
 
 
+def describe_Endpoint():
+    class ArgsSchema(BaseModel):
+        id: str
+        query: str
+        authorization: str
+
+    endpoint = Endpoint(
+        method='get',
+        path='/dummy/{id}',
+        description='Endpoint description',
+        args_schema=ArgsSchema,
+        args_source={'id': 'path', 'api_key': 'query', 'query': 'query', 'authorization': 'header'},
+    )
+
+    def describe_path_args():
+        def extract_path_args():
+            assert endpoint.path_args == ['id']
+
+    def describe_query_args():
+        def extract_query_args():
+            assert endpoint.query_args == ['api_key', 'query']
+
+    def describe_header_args():
+        def extract_header_args():
+            assert endpoint.header_args == ['authorization']
+
+
 def describe_OpenApiTool():
     class ArgsSchema(BaseModel):
         query: str
 
-    class ArgsSchemaWithId(BaseModel):
+    class ArgsSchemaWithIdAndHeader(BaseModel):
         id: str
         query: str
+        authorization: str
 
     def describe_init():
         def initialize_tool():
@@ -37,7 +65,7 @@ def describe_OpenApiTool():
                 method='get',
                 path='/dummy/{id}',
                 description='Endpoint description',
-                args_schema=ArgsSchemaWithId,
+                args_schema=ArgsSchemaWithIdAndHeader,
                 args_source={'id': 'path', 'api_key': 'query', 'query': 'query'},
             )
             tool = OpenApiTool(
@@ -106,6 +134,35 @@ def describe_OpenApiTool():
             result = tool.request_by_spec(query='dummy query')
             assert result == 'result is plain text'
 
+        def send_get_request_with_headers(requests_mock):
+            requests_mock.get('http://localhost/dummy', text='result is plain text')
+
+            endpoint = Endpoint(
+                method='get',
+                path='/dummy',
+                description='Endpoint description',
+                args_schema=ArgsSchemaWithIdAndHeader,
+                args_source={'query': 'query', 'authorization': 'header'},
+            )
+            tool = OpenApiTool(
+                description='Integration description',
+                server='http://localhost',
+                endpoint=endpoint,
+                parameters={'authorization': 'Bearer dummy'},
+            )
+            result = tool.request_by_spec(query='dummy query')
+            assert result == 'result is plain text'
+
+            history = requests_mock.request_history[0]
+            assert history.method == 'GET'
+            assert history.scheme == 'http'
+            assert history.netloc == 'localhost'
+            assert history.path == '/dummy'
+            assert history.headers.get('authorization') == 'Bearer dummy'
+            assert history.qs == {
+                'query': ['dummy query'],
+            }
+
         def send_post_request(requests_mock):
             requests_mock.post('http://localhost/dummy', text='{"result": "dummy"}')
 
@@ -141,7 +198,7 @@ def describe_OpenApiTool():
                 method='get',
                 path='/dummy/{id}',
                 description='Endpoint description',
-                args_schema=ArgsSchemaWithId,
+                args_schema=ArgsSchemaWithIdAndHeader,
                 args_source={'id': 'path', 'api_key': 'query', 'query': 'query'},
             )
             tool = OpenApiTool(

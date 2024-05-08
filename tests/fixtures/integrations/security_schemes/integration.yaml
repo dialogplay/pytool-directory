@@ -1,0 +1,3 @@
+version: 0.0.1-dev
+openApi: ./openapi.yaml
+description: with header parameter in securitySchemes

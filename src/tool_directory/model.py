@@ -28,6 +28,10 @@ class Endpoint(BaseModel):
     def query_args(self):
         return [k for k, v in self.args_source.items() if v == 'query']
 
+    @cached_property
+    def header_args(self):
+        return [k for k, v in self.args_source.items() if v == 'header']
+
 
 class OpenApiTool(StructuredTool):
     server: str
@@ -51,13 +55,15 @@ class OpenApiTool(StructuredTool):
         )
 
     def request_by_spec(self, **kwargs):
-        path_args = {k: v for k, v in kwargs.items() if k in self.endpoint.path_args}
-        query_args = {k: v for k, v in kwargs.items() if k in self.endpoint.query_args}
+        parameters = kwargs | self.parameters
+        path_args = {k: v for k, v in parameters.items() if k in self.endpoint.path_args}
+        query_args = {k: v for k, v in parameters.items() if k in self.endpoint.query_args}
+        header_args = {k: v for k, v in parameters.items() if k in self.endpoint.header_args}
         url = (self.server + self.endpoint.path).format(**path_args)
         if self.endpoint.method == 'get':
-            response = requests.get(url, params=query_args | self.parameters)
+            response = requests.get(url, headers=header_args, params=query_args)
         elif self.endpoint.method == 'post':
-            response = requests.post(url, data=query_args | self.parameters)
+            response = requests.post(url, headers=header_args, data=query_args)
         else:
             return None
 
