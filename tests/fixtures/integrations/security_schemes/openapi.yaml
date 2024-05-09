@@ -1,0 +1,268 @@
+openapi: 3.0.3
+info:
+  title: 'Real Estate Information Library API'
+  description: 'This is a API that can retrieve data from the Real Esate Information Library.'
+  version: 0.0.1
+externalDocs:
+  description: Find out more about Real Estate Information Library API
+  url: https://www.reinfolib.mlit.go.jp/
+servers:
+  - url: https://www.reinfolib.mlit.go.jp
+paths:
+  /ex-api/external/XIT001:
+    get:
+      summary: '不動産価格（取引価格・成約価格）情報取得API。Real Estate Prices (Transaction price/Contract price)'
+      security:
+        - Ocp-Apim-Subscription-Key: []
+      parameters:
+        -
+          name: year
+          in: query
+          description: '取引時期（年）。形式はYYYY（数字4桁）、YYYY … 西暦、※2005（2005年は第3四半期と第4四半期のみ）より指定可能'
+          schema:
+            type: string
+          required: true
+          example: '2022'
+        -
+          name: quater
+          in: query
+          description: '取引時期（四半期）。形式はN（数字1桁）、N … 1～4（1:1月～3月、2:4月～6月、3:7月～10月、4:11月～12月）'
+          schema:
+            type: string
+          example: 1
+          enum:
+            - 1
+            - 2
+            - 3
+            - 4
+            - null
+        -
+          name: city
+          in: query
+          description: '市区町村コード。形式はNNNNN（数字5桁）、NNNNN … 全国地方公共団体コードの上5桁'
+          schema:
+            type: string
+          example: 13102
+        -
+          name: station
+          in: query
+          description: '駅コード。形式はNNNNNN（数字6桁）、NNNNNN … 駅コード、国土数値情報の駅データ（鉄道データの下位クラス）のグループコード（N02_005g）を指定します。https://nlftp.mlit.go.jp/ksj/gml/datalist/KsjTmplt-N02-v3_1.htmlを参照。'
+          schema:
+            type: string
+          example: 003785
+        -
+          name: language
+          in: query
+          description: 'Result language, ja:japanese, en:english. 出力結果の言語。ja…日本語、en…英語、未指定…日本語'
+          schema:
+            type: string
+          example: ja
+      responses:
+        200:
+          description: 'XIT001'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/XIT001'
+        400:
+          description: 'Bad Request. Parameter error.'
+        401:
+          description: 'Unauthorized. Invalid access token.'
+        403:
+          description: 'Forbidden.'
+        404:
+          description: 'Not Found.'
+        500:
+          description: 'Internal Server Error.'
+        503:
+          description: 'Service Unavailable.'
+  /ex-api/external/XIT002:
+    get:
+      summary: '都道府県内市区町村一覧取得API。City list'
+      security:
+        - Ocp-Apim-Subscription-Key: []
+      parameters:
+        -
+          name: area
+          in: query
+          description: '都道府県コード。形式はNN（数字2桁）、NN … 都道府県コード。例）13:東京都'
+          schema:
+            type: string
+          required: true
+          example: 13
+        -
+          name: language
+          in: query
+          description: '出力結果の言語。ja…日本語、en…英語、未指定…日本語'
+          schema:
+            type: string
+          example: ja
+      responses:
+        200:
+          description: 'XIT002'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/XIT002'
+        400:
+          description: 'Bad Request. Parameter error.'
+        401:
+          description: 'Unauthorized. Invalid access token.'
+        403:
+          description: 'Forbidden.'
+        404:
+          description: 'Not Found.'
+        500:
+          description: 'Internal Server Error.'
+        503:
+          description: 'Service Unavailable.'
+components:
+  securitySchemes:
+    Ocp-Apim-Subscription-Key:
+      type: apiKey
+      in: header
+      name: Ocp-Apim-Subscription-Key
+      description: API key to access the service.
+  schemas:
+    XIT001:
+      type: object
+      properties:
+        status:
+          type: string
+          example: 'OK'
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              PriceCategory:
+                type: string
+                description: '分類'
+                example: '不動産取引価格情報'
+              Type:
+                type: string
+                description: '取引の種類'
+                example: '宅地(土地と建物)'
+              Region:
+                type: string
+                description: '地区'
+                example: '商業地'
+              MunicipalityCode:
+                type: string
+                description: '市区町村コード'
+                example: '13102'
+              Prefecture:
+                type: string
+                description: '都道府県名'
+                example: '東京都'
+              Municipality:
+                type: string
+                description: '市区町村名'
+                example: '中央区'
+              DistrictName:
+                type: string
+                description: '地区名'
+                example: '八重洲'
+              TradePrice:
+                type: string
+                description: '取引価格（総額）'
+                example: '36000000'
+              PricePerUnit:
+                type: string
+                description: '坪単価'
+                example: ''
+              FloorPlan:
+                type: string
+                description: '間取り'
+                example: ''
+              Area:
+                type: string
+                description: '面積（平方メートル）'
+                example: '40'
+              UnitPrice:
+                type: string
+                description: '取引価格（平方メートル単価）'
+                example: ''
+              LandShape:
+                type: string
+                description: '土地の形状'
+                example: '長方形'
+              Frontage:
+                type: string
+                description: '間口'
+                example: '4.1'
+              TotalFloorArea:
+                type: string
+                description: '延床面積（平方メートル）'
+                example: '95'
+              BuildingYear:
+                type: string
+                description: '建築年'
+                example: '1947年'
+              Structure:
+                type: string
+                description: '建物の構造'
+                example: '木造'
+              Use:
+                type: string
+                description: '用途'
+                example: '住宅、店舗'
+              Purpose:
+                type: string
+                description: '今後の利用目的'
+                example: '店舗'
+              Direction:
+                type: string
+                description: '前面道路：方位'
+                example: '南西'
+              Classification:
+                type: string
+                description: '前面道路：種類'
+                example: '私道'
+              Breadth:
+                type: string
+                description: '前面道路：幅員（m）'
+                example: '3'
+              CityPlanning:
+                type: string
+                description: '都市計画'
+                example: '商業地域'
+              CoverageRatio:
+                type: string
+                description: '建蔽率（%）'
+                example: '80'
+              FloorAreaRatio:
+                type: string
+                description: '容積率（%）'
+                example: '800'
+              Period:
+                type: string
+                description: '取引時点'
+                example: '2022年第1四半期'
+              Renovation:
+                type: string
+                description: '改装'
+                example: ''
+              Remarks:
+                type: string
+                description: '取引の事情等'
+                example: '私道を含む取引'
+    XIT002:
+      type: object
+      properties:
+        status:
+          type: string
+          example: 'OK'
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                description: '市区町村コード'
+                example: '13101'
+              name:
+                type: string
+                description: '市区町村名'
+                example: '千代田区'

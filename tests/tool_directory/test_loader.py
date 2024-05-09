@@ -85,3 +85,36 @@ def describe_ToolLoader():
             assert tools[0].args_schema.schema().get('required', []) == ['api_key']
             assert tools[1].args_schema.schema().get('required', []) == []
             assert tools[2].args_schema.schema().get('required', []) == ['petId']
+
+        def handle_security_schemes(requests_mock):
+            loader = ToolLoader('security_schemes')
+            tools = loader.get_tools()
+            assert len(tools) == 2
+            assert isinstance(tools[0], OpenApiTool)
+
+            assert tools[0].endpoint.args_source == {
+                'Ocp-Apim-Subscription-Key': 'header',
+                'year': 'query',
+                'quater': 'query',
+                'city': 'query',
+                'station': 'query',
+                'language': 'query',
+            }
+            assert tools[0].args_schema.schema().get('properties').keys() == {
+                'Ocp-Apim-Subscription-Key',
+                'year',
+                'quater',
+                'city',
+                'station',
+                'language',
+            }
+            assert tools[1].endpoint.args_source == {
+                'Ocp-Apim-Subscription-Key': 'header',
+                'area': 'query',
+                'language': 'query',
+            }
+            assert tools[1].args_schema.schema().get('properties').keys() == {
+                'Ocp-Apim-Subscription-Key',
+                'area',
+                'language',
+            }

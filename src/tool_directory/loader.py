@@ -1,3 +1,5 @@
+import copy
+import itertools
 import logging
 from typing import Any, Dict, List, Union
 from urllib.parse import urljoin
@@ -106,14 +108,33 @@ class ToolLoader:
         # Check required flag and default value
         parameters = {
             x.get('name'): (str, Field()) if x.get('required') else (str, Field(None))
-            for x in endpoint.get('parameters', [])
+            for x in self._get_parameters(endpoint)
         }
 
         return create_model('ArgumentsSchema', **parameters)
 
     def _create_args_source(self, endpoint: Dict[str, Any]) -> Dict[str, str]:
         args_source = {}
-        for parameter in endpoint.get('parameters', []):
+        for parameter in self._get_parameters(endpoint):
             args_source[parameter.get('name')] = parameter.get('in')
 
         return args_source
+
+    def _get_parameters(self, endpoint: Dict[str, Any]):
+        parameters = copy.deepcopy(endpoint.get('parameters', []))
+        security_keys = list(itertools.chain.from_iterable([x.keys() for x in endpoint.get('security', [])]))
+        if not security_keys:
+            return parameters
+
+        security_schemes = self.spec.get('components', {}).get('securitySchemes', {})
+        for key in security_keys:
+            security_scheme = security_schemes.get(key)
+            parameters.append(
+                {
+                    'name': security_scheme['name'],
+                    'in': security_scheme['in'],
+                    'description': security_scheme['description'],
+                }
+            )
+
+        return parameters
