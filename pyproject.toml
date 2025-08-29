@@ -22,6 +22,8 @@ dependencies = [
   "requests",
   "openai",
   "langchain",
+  "langchain-openai",
+  "langgraph",
   "PyYAML",
 ]
 
