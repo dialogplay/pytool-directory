@@ -1,9 +1,10 @@
 import re
+import urllib
 from functools import cached_property
 from typing import Dict, List, Type
 
 import requests
-from langchain.tools.base import StructuredTool
+from langchain_core.tools import StructuredTool
 from pydantic import BaseModel, computed_field
 
 from .prompt import TOOL_DESCRIPTION
@@ -37,14 +38,29 @@ class OpenApiTool(StructuredTool):
     endpoint: Endpoint
     parameters: Dict[str, str]
 
+    def sanitize(self, text):
+        text = text.replace('/', '-')
+        text = text.replace('.', '-')
+        return re.sub(r'[^a-zA-Z0-9_-]', '', text)
+
     def __init__(self, description: str, server: str, endpoint: Endpoint, parameters: Dict[str, str]):
-        escaped_path = re.sub(r'\{(.*?)\}', ':\\1', endpoint.path)
+        url = urllib.parse.urlparse(server)
+
+        name_items = []
+        name_items.append(endpoint.method.upper())
+        name_items.append(url.netloc)
+        if url.path:
+            name_items.append(url.path.strip('/'))
+        if endpoint.path != '/':
+            name_items.append(re.sub(r'\{(.*?)\}', '\\1', endpoint.path.strip('/')))
+
         tool_description = TOOL_DESCRIPTION.format(
-            description=description, endpoint=f'{endpoint.method.upper()} {escaped_path} {endpoint.description}'
+            description=description,
+            endpoint=f'{endpoint.method.upper()} {server}{endpoint.path} {endpoint.description}',
         )
 
         return super().__init__(
-            name=f'{endpoint.method.upper()} {server}{escaped_path}',
+            name='-'.join([self.sanitize(x) for x in name_items]),
             description=tool_description,
             server=server,
             endpoint=endpoint,

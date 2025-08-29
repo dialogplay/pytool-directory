@@ -33,20 +33,23 @@ def describe_ToolLoader():
             assert len(tools) == 3
             assert isinstance(tools[0], OpenApiTool)
 
-            assert tools[0].name == 'GET http://localhost/dummy/pets'
-            assert tools[1].name == 'POST http://localhost/dummy/pets'
-            assert tools[2].name == 'GET http://localhost/dummy/pets/:petId'
+            assert tools[0].name == 'GET-localhost-dummy-pets'
+            assert tools[1].name == 'POST-localhost-dummy-pets'
+            assert tools[2].name == 'GET-localhost-dummy-pets-petId'
 
             assert (
                 tools[0].description
-                == 'Description: dummy integration description\nEndpoint: GET /pets Retrieves dummy data from api.'
+                == 'Description: dummy integration description\nEndpoint: GET http://localhost/dummy/pets Retrieves'
+                ' dummy data from api.'
             )
             assert (
-                tools[1].description == 'Description: dummy integration description\nEndpoint: POST /pets Create a pet'
+                tools[1].description
+                == 'Description: dummy integration description\nEndpoint: POST http://localhost/dummy/pets Create a pet'
             )
             assert (
                 tools[2].description
-                == 'Description: dummy integration description\nEndpoint: GET /pets/:petId Info for a specific pet'
+                == 'Description: dummy integration description\nEndpoint: GET http://localhost/dummy/pets/{petId} Info'
+                ' for a specific pet'
             )
 
             assert tools[0].server == 'http://localhost/dummy'
