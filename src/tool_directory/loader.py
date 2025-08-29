@@ -6,7 +6,7 @@ from urllib.parse import urljoin
 
 import requests
 import yaml
-from pydantic.v1 import BaseModel, Field, create_model
+from pydantic import BaseModel, Field, create_model
 
 from .exceptions import ToolNotFoundException
 from .model import Endpoint, OpenApiTool

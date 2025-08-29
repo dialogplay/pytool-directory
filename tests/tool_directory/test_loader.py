@@ -78,13 +78,13 @@ def describe_ToolLoader():
             assert tools[1].parameters == {'api_key': 'dummy'}
             assert tools[2].parameters == {'api_key': 'dummy'}
 
-            assert tools[0].args_schema.schema().get('properties').keys() == {'api_key', 'limit'}
-            assert tools[1].args_schema.schema().get('properties').keys() == set()
-            assert tools[2].args_schema.schema().get('properties').keys() == {'petId'}
+            assert tools[0].args_schema.model_json_schema().get('properties').keys() == {'api_key', 'limit'}
+            assert tools[1].args_schema.model_json_schema().get('properties').keys() == set()
+            assert tools[2].args_schema.model_json_schema().get('properties').keys() == {'petId'}
 
-            assert tools[0].args_schema.schema().get('required', []) == ['api_key']
-            assert tools[1].args_schema.schema().get('required', []) == []
-            assert tools[2].args_schema.schema().get('required', []) == ['petId']
+            assert tools[0].args_schema.model_json_schema().get('required', []) == ['api_key']
+            assert tools[1].args_schema.model_json_schema().get('required', []) == []
+            assert tools[2].args_schema.model_json_schema().get('required', []) == ['petId']
 
         def handle_security_schemes(requests_mock):
             loader = ToolLoader('security_schemes')
@@ -100,7 +100,7 @@ def describe_ToolLoader():
                 'station': 'query',
                 'language': 'query',
             }
-            assert tools[0].args_schema.schema().get('properties').keys() == {
+            assert tools[0].args_schema.model_json_schema().get('properties').keys() == {
                 'Ocp-Apim-Subscription-Key',
                 'year',
                 'quater',
@@ -113,7 +113,7 @@ def describe_ToolLoader():
                 'area': 'query',
                 'language': 'query',
             }
-            assert tools[1].args_schema.schema().get('properties').keys() == {
+            assert tools[1].args_schema.model_json_schema().get('properties').keys() == {
                 'Ocp-Apim-Subscription-Key',
                 'area',
                 'language',

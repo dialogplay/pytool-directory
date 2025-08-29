@@ -1,4 +1,4 @@
-from pydantic.v1 import BaseModel
+from pydantic import BaseModel
 
 from tool_directory.model import Endpoint, OpenApiTool
 

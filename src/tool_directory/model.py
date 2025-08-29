@@ -1,10 +1,10 @@
 import re
 from functools import cached_property
-from typing import Dict, Type
+from typing import Dict, List, Type
 
 import requests
 from langchain.tools.base import StructuredTool
-from pydantic.v1 import BaseModel
+from pydantic import BaseModel, computed_field
 
 from .prompt import TOOL_DESCRIPTION
 
@@ -16,20 +16,19 @@ class Endpoint(BaseModel):
     args_schema: Type[BaseModel]
     args_source: Dict[str, str]
 
-    class Config:
-        # Allow @cached_property with pydantic v1
-        keep_untouched = (cached_property,)
-
+    @computed_field
     @cached_property
-    def path_args(self):
+    def path_args(self) -> List[str]:
         return [k for k, v in self.args_source.items() if v == 'path']
 
+    @computed_field
     @cached_property
-    def query_args(self):
+    def query_args(self) -> List[str]:
         return [k for k, v in self.args_source.items() if v == 'query']
 
+    @computed_field
     @cached_property
-    def header_args(self):
+    def header_args(self) -> List[str]:
         return [k for k, v in self.args_source.items() if v == 'header']
 
 
