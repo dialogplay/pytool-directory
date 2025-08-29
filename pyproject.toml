@@ -10,7 +10,7 @@ authors = [
 ]
 description = "Python package to create langchain tool from the Tool Directory For LangChain."
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.13"
 keywords = ["langchain", "gpt", "dialogplay"]
 license = {text = "MIT"}
 classifiers = [
