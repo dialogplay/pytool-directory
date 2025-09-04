@@ -1,11 +1,11 @@
 repos:
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.17.1
+  - repo: local
     hooks:
-      - id: mypy
-        additional_dependencies:
-          - types-requests
-          - types-PyYAML
+      - id: pyright
+        name: pyright
+        entry: pyright
+        language: system
+        types: [python]
   - repo: https://github.com/PyCQA/isort
     rev: 6.0.1
     hooks:
