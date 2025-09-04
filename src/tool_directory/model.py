@@ -1,11 +1,12 @@
 import re
 import urllib.parse
 from functools import cached_property
-from typing import Dict, List
+from typing import Any, Dict, List
 
 import requests
 from langchain_core.tools import StructuredTool
-from pydantic import BaseModel, computed_field
+from langchain_core.tools.base import ArgsSchema
+from pydantic import BaseModel, Field, computed_field
 
 from .prompt import TOOL_DESCRIPTION
 
@@ -34,6 +35,8 @@ class Endpoint(BaseModel):
 
 
 class OpenApiTool(StructuredTool):
+    name: str = Field(default='')
+    args_schema: ArgsSchema = Field(default=BaseModel)
     server: str
     endpoint: Endpoint
     parameters: Dict[str, str]
@@ -43,31 +46,26 @@ class OpenApiTool(StructuredTool):
         text = text.replace('.', '-')
         return re.sub(r'[^a-zA-Z0-9_-]', '', text)
 
-    def __init__(self, description: str, server: str, endpoint: Endpoint, parameters: Dict[str, str]):
-        url = urllib.parse.urlparse(server)
+    def model_post_init(self, context: Any):
+        url = urllib.parse.urlparse(self.server)
 
         name_items = []
-        name_items.append(endpoint.method.upper())
+        name_items.append(self.endpoint.method.upper())
         name_items.append(url.netloc)
         if url.path:
             name_items.append(url.path.strip('/'))
-        if endpoint.path != '/':
-            name_items.append(re.sub(r'\{(.*?)\}', '\\1', endpoint.path.strip('/')))
+        if self.endpoint.path != '/':
+            name_items.append(re.sub(r'\{(.*?)\}', '\\1', self.endpoint.path.strip('/')))
 
         tool_description = TOOL_DESCRIPTION.format(
-            description=description,
-            endpoint=f'{endpoint.method.upper()} {server}{endpoint.path} {endpoint.description}',
+            description=self.description,
+            endpoint=f'{self.endpoint.method.upper()} {self.server}{self.endpoint.path} {self.endpoint.description}',
         )
 
-        return super().__init__(
-            name='-'.join([self.sanitize(x) for x in name_items]),
-            description=tool_description,
-            server=server,
-            endpoint=endpoint,
-            args_schema=endpoint.args_schema,
-            func=self.request_by_spec,
-            parameters=parameters,
-        )
+        self.name = '-'.join([self.sanitize(x) for x in name_items])
+        self.description = tool_description
+        self.args_schema = self.endpoint.args_schema
+        self.func = self.request_by_spec
 
     def request_by_spec(self, **kwargs):
         parameters = kwargs | self.parameters
