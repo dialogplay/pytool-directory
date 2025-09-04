@@ -60,7 +60,7 @@ docstring-quotes = "single"
 [tool.pytest.ini_options]
 pythonpath = "src"
 testpaths = ["tests"]
-addopts = "--cov"
+addopts = "--cov=src"
 
 [tool.coverage.run]
 branch = true
