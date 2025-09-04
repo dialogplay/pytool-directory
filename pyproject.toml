@@ -44,6 +44,8 @@ dev = [
     "pytest-describe",
     "pytest-watcher",
     "requests-mock",
+    "twine",
+    "build",
 ]
 
 [tool.black]
