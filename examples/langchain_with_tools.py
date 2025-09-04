@@ -17,7 +17,7 @@ if 'OPENWEATHER_APP_ID' not in os.environ:
 # Execute with following environment variables
 #   - OPENAI_API_KEY: The API Key for OpenAI
 #   - OPENWEATHER_APP_ID: The API Key for OpenWeather
-appid = os.environ.get('OPENWEATHER_APP_ID')
+appid = os.environ['OPENWEATHER_APP_ID']
 llm = ChatOpenAI(temperature=0, model='gpt-4')
 
 tools = ToolLoader('openweather').get_tools(parameters={'appid': appid})

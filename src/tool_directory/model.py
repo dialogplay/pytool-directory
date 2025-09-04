@@ -1,7 +1,7 @@
 import re
-import urllib
+import urllib.parse
 from functools import cached_property
-from typing import Dict, List, Type
+from typing import Dict, List
 
 import requests
 from langchain_core.tools import StructuredTool
@@ -14,7 +14,7 @@ class Endpoint(BaseModel):
     method: str
     path: str
     description: str
-    args_schema: Type[BaseModel]
+    args_schema: type[BaseModel]
     args_source: Dict[str, str]
 
     @computed_field

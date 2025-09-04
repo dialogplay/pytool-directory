@@ -1,4 +1,5 @@
 import pytest
+from pydantic import BaseModel
 
 from tool_directory import OpenApiTool, ToolLoader
 from tool_directory.exceptions import ToolNotFoundException
@@ -81,9 +82,16 @@ def describe_ToolLoader():
             assert tools[1].parameters == {'api_key': 'dummy'}
             assert tools[2].parameters == {'api_key': 'dummy'}
 
-            assert tools[0].args_schema.model_json_schema().get('properties').keys() == {'api_key', 'limit'}
-            assert tools[1].args_schema.model_json_schema().get('properties').keys() == set()
-            assert tools[2].args_schema.model_json_schema().get('properties').keys() == {'petId'}
+            assert isinstance(tools[0].args_schema, type)
+            assert isinstance(tools[1].args_schema, type)
+            assert isinstance(tools[2].args_schema, type)
+            assert issubclass(tools[0].args_schema, BaseModel)
+            assert issubclass(tools[1].args_schema, BaseModel)
+            assert issubclass(tools[2].args_schema, BaseModel)
+
+            assert tools[0].args_schema.model_json_schema().get('properties', {}).keys() == {'api_key', 'limit'}
+            assert tools[1].args_schema.model_json_schema().get('properties', {}).keys() == set()
+            assert tools[2].args_schema.model_json_schema().get('properties', {}).keys() == {'petId'}
 
             assert tools[0].args_schema.model_json_schema().get('required', []) == ['api_key']
             assert tools[1].args_schema.model_json_schema().get('required', []) == []
@@ -94,6 +102,11 @@ def describe_ToolLoader():
             tools = loader.get_tools()
             assert len(tools) == 2
             assert isinstance(tools[0], OpenApiTool)
+            assert isinstance(tools[1], OpenApiTool)
+            assert isinstance(tools[0].args_schema, type)
+            assert isinstance(tools[1].args_schema, type)
+            assert issubclass(tools[0].args_schema, BaseModel)
+            assert issubclass(tools[1].args_schema, BaseModel)
 
             assert tools[0].endpoint.args_source == {
                 'Ocp-Apim-Subscription-Key': 'header',
@@ -103,7 +116,7 @@ def describe_ToolLoader():
                 'station': 'query',
                 'language': 'query',
             }
-            assert tools[0].args_schema.model_json_schema().get('properties').keys() == {
+            assert tools[0].args_schema.model_json_schema().get('properties', {}).keys() == {
                 'Ocp-Apim-Subscription-Key',
                 'year',
                 'quater',
@@ -116,7 +129,7 @@ def describe_ToolLoader():
                 'area': 'query',
                 'language': 'query',
             }
-            assert tools[1].args_schema.model_json_schema().get('properties').keys() == {
+            assert tools[1].args_schema.model_json_schema().get('properties', {}).keys() == {
                 'Ocp-Apim-Subscription-Key',
                 'area',
                 'language',
