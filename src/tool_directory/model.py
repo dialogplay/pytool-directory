@@ -1,10 +1,12 @@
 import re
+import urllib.parse
 from functools import cached_property
-from typing import Dict, Type
+from typing import Any, Dict, List
 
 import requests
-from langchain.tools.base import StructuredTool
-from pydantic.v1 import BaseModel
+from langchain_core.tools import StructuredTool
+from langchain_core.tools.base import ArgsSchema
+from pydantic import BaseModel, Field, computed_field
 
 from .prompt import TOOL_DESCRIPTION
 
@@ -13,46 +15,57 @@ class Endpoint(BaseModel):
     method: str
     path: str
     description: str
-    args_schema: Type[BaseModel]
+    args_schema: type[BaseModel]
     args_source: Dict[str, str]
 
-    class Config:
-        # Allow @cached_property with pydantic v1
-        keep_untouched = (cached_property,)
-
+    @computed_field
     @cached_property
-    def path_args(self):
+    def path_args(self) -> List[str]:
         return [k for k, v in self.args_source.items() if v == 'path']
 
+    @computed_field
     @cached_property
-    def query_args(self):
+    def query_args(self) -> List[str]:
         return [k for k, v in self.args_source.items() if v == 'query']
 
+    @computed_field
     @cached_property
-    def header_args(self):
+    def header_args(self) -> List[str]:
         return [k for k, v in self.args_source.items() if v == 'header']
 
 
 class OpenApiTool(StructuredTool):
+    name: str = Field(default='')
+    args_schema: ArgsSchema = Field(default=BaseModel)
     server: str
     endpoint: Endpoint
     parameters: Dict[str, str]
 
-    def __init__(self, description: str, server: str, endpoint: Endpoint, parameters: Dict[str, str]):
-        escaped_path = re.sub(r'\{(.*?)\}', ':\\1', endpoint.path)
+    def sanitize(self, text):
+        text = text.replace('/', '-')
+        text = text.replace('.', '-')
+        return re.sub(r'[^a-zA-Z0-9_-]', '', text)
+
+    def model_post_init(self, context: Any):
+        url = urllib.parse.urlparse(self.server)
+
+        name_items = []
+        name_items.append(self.endpoint.method.upper())
+        name_items.append(url.netloc)
+        if url.path:
+            name_items.append(url.path.strip('/'))
+        if self.endpoint.path != '/':
+            name_items.append(re.sub(r'\{(.*?)\}', '\\1', self.endpoint.path.strip('/')))
+
         tool_description = TOOL_DESCRIPTION.format(
-            description=description, endpoint=f'{endpoint.method.upper()} {escaped_path} {endpoint.description}'
+            description=self.description,
+            endpoint=f'{self.endpoint.method.upper()} {self.server}{self.endpoint.path} {self.endpoint.description}',
         )
 
-        return super().__init__(
-            name=f'{endpoint.method.upper()} {server}{escaped_path}',
-            description=tool_description,
-            server=server,
-            endpoint=endpoint,
-            args_schema=endpoint.args_schema,
-            func=self.request_by_spec,
-            parameters=parameters,
-        )
+        self.name = '-'.join([self.sanitize(x) for x in name_items])
+        self.description = tool_description
+        self.args_schema = self.endpoint.args_schema
+        self.func = self.request_by_spec
 
     def request_by_spec(self, **kwargs):
         parameters = kwargs | self.parameters

@@ -1,4 +1,4 @@
-from pydantic.v1 import BaseModel
+from pydantic import BaseModel
 
 from tool_directory.model import Endpoint, OpenApiTool
 
@@ -43,7 +43,7 @@ def describe_OpenApiTool():
         def initialize_tool():
             endpoint = Endpoint(
                 method='get',
-                path='/dummy',
+                path='/',
                 description='Endpoint description',
                 args_schema=ArgsSchema,
                 args_source={'api_key': 'query', 'query': 'query'},
@@ -54,9 +54,34 @@ def describe_OpenApiTool():
                 endpoint=endpoint,
                 parameters={'api_key': 'dummy'},
             )
-            assert tool.name == 'GET http://localhost/dummy'
-            assert tool.description == 'Description: Integration description\nEndpoint: GET /dummy Endpoint description'
+            assert tool.name == 'GET-localhost'
+            assert tool.description == (
+                'Description: Integration description\n' 'Endpoint: GET http://localhost/ Endpoint description'
+            )
             assert tool.server == 'http://localhost'
+            assert tool.endpoint == endpoint
+            assert tool.parameters == {'api_key': 'dummy'}
+
+        def initialize_tool_with_sanitizing():
+            endpoint = Endpoint(
+                method='get',
+                path='/dummy/@2.0',
+                description='Endpoint description',
+                args_schema=ArgsSchema,
+                args_source={'api_key': 'query', 'query': 'query'},
+            )
+            tool = OpenApiTool(
+                description='Integration description',
+                server='http://example.com/api/1.0',
+                endpoint=endpoint,
+                parameters={'api_key': 'dummy'},
+            )
+            assert tool.name == 'GET-example-com-api-1-0-dummy-2-0'
+            assert tool.description == (
+                'Description: Integration description\n'
+                'Endpoint: GET http://example.com/api/1.0/dummy/@2.0 Endpoint description'
+            )
+            assert tool.server == 'http://example.com/api/1.0'
             assert tool.endpoint == endpoint
             assert tool.parameters == {'api_key': 'dummy'}
 
@@ -74,10 +99,10 @@ def describe_OpenApiTool():
                 endpoint=endpoint,
                 parameters={'api_key': 'dummy'},
             )
-            assert tool.name == 'GET http://localhost/dummy/:id'
-            assert (
-                tool.description
-                == 'Description: Integration description\nEndpoint: GET /dummy/:id Endpoint description'
+            assert tool.name == 'GET-localhost-dummy-id'
+            assert tool.description == (
+                'Description: Integration description\n'
+                'Endpoint: GET http://localhost/dummy/{id} Endpoint description'
             )
             assert tool.server == 'http://localhost'
             assert tool.endpoint == endpoint

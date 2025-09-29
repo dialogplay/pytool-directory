@@ -6,7 +6,7 @@ from urllib.parse import urljoin
 
 import requests
 import yaml
-from pydantic.v1 import BaseModel, Field, create_model
+from pydantic import BaseModel, Field, create_model
 
 from .exceptions import ToolNotFoundException
 from .model import Endpoint, OpenApiTool
@@ -104,9 +104,12 @@ class ToolLoader:
 
         return endpoints
 
-    def _create_args_schema(self, endpoint: Dict[str, Any]) -> BaseModel:
+    def _create_args_schema(self, endpoint: Dict[str, Any]) -> type[BaseModel]:
         # Check required flag and default value
-        parameters = {
+        # pyright reports error if specify tuple[str, Any] which is defined in create_model
+        # due to optional different type arguments(such as __config__ as ConfigDict) will be included.
+        # https://github.com/microsoft/pyright/issues/10698
+        parameters: dict[str, Any] = {
             x.get('name'): (str, Field()) if x.get('required') else (str, Field(None))
             for x in self._get_parameters(endpoint)
         }

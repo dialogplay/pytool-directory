@@ -4,13 +4,13 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pytool-directory"
-version = "0.0.2"
+version = "0.0.3"
 authors = [
     {name = "Sheile"},
 ]
 description = "Python package to create langchain tool from the Tool Directory For LangChain."
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.13"
 keywords = ["langchain", "gpt", "dialogplay"]
 license = {text = "MIT"}
 classifiers = [
@@ -22,6 +22,8 @@ dependencies = [
   "requests",
   "openai",
   "langchain",
+  "langchain-openai",
+  "langgraph",
   "PyYAML",
 ]
 
@@ -36,11 +38,14 @@ dev = [
     "flake8",
     "pyproject-flake8",
     "flake8-quotes",
+    "pyright",
     "pytest",
     "pytest-cov",
     "pytest-describe",
     "pytest-watcher",
     "requests-mock",
+    "twine",
+    "build",
 ]
 
 [tool.black]
@@ -60,7 +65,7 @@ docstring-quotes = "single"
 [tool.pytest.ini_options]
 pythonpath = "src"
 testpaths = ["tests"]
-addopts = "--cov"
+addopts = "--cov=src"
 
 [tool.coverage.run]
 branch = true

@@ -1,21 +1,21 @@
 repos:
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.5.1
+  - repo: local
     hooks:
-      - id: mypy
-        additional_dependencies:
-          - types-requests
-          - types-PyYAML
+      - id: pyright
+        name: pyright
+        entry: pyright
+        language: system
+        types: [python]
   - repo: https://github.com/PyCQA/isort
-    rev: 5.12.0
+    rev: 6.0.1
     hooks:
       - id: isort
   - repo: https://github.com/psf/black
-    rev: 23.7.0
+    rev: 25.1.0
     hooks:
       - id: black
   - repo: https://github.com/PyCQA/flake8
-    rev: 6.0.0
+    rev: 7.0.0
     hooks:
       - id: flake8
         entry: pflake8
