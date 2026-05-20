@@ -1,8 +1,8 @@
 import os
 import sys
 
+from langchain.agents import create_agent
 from langchain_openai.chat_models import ChatOpenAI
-from langgraph.prebuilt import create_react_agent
 
 from tool_directory import ToolLoader
 
@@ -22,6 +22,6 @@ llm = ChatOpenAI(temperature=0, model='gpt-4')
 
 tools = ToolLoader('openweather').get_tools(parameters={'appid': appid})
 
-agent = create_react_agent(llm, tools)
-messages = agent.invoke({'messages': [('human', 'Please tell me about the temperature in tokyo.')]})
+agent = create_agent(llm, tools)
+messages = agent.invoke({'messages': [{'role': 'user', 'content': 'Please tell me about the temperature in tokyo.'}]})
 print(messages['messages'][-1].content)
